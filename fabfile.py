@@ -111,15 +111,24 @@ def setup_packages():
     package_update()
 
     with hide("running"):
-        package_ensure("chromium")
-        package_ensure("x11-xserver-utils")
-        package_ensure("unclutter")
         package_ensure("htop")
         package_ensure("bmon")
         # ... but I always use vim.
         package_ensure("vim")
         package_ensure("python-pip")
 
+
+@task
+def setup_kiosk_packages():
+    """ Installs basic Raspbian package requirements.
+    """
+    puts(green("Installing packages"))
+    package_update()
+
+    with hide("running"):
+        package_ensure("chromium")
+        package_ensure("x11-xserver-utils")
+        package_ensure("unclutter")
 
 @task
 def reboot():
@@ -188,6 +197,8 @@ def status():
 def setup_kiosk():
     """ set up kiosk parts 
         based on https://www.danpurdy.co.uk/web-development/raspberry-pi-kiosk-screen-tutorial/
+        or
+        http://www.raspberry-projects.com/pi/pi-operating-systems/raspbian/gui/auto-run-browser-on-startup
     """
     with hide("running", "stderr"):
         #@xscreensaver -no-splash
@@ -221,6 +232,7 @@ def deploy():
     puts(green("Starting deployment"))
     upgrade_packages()
     setup_packages()
+    setup_kiosk_packages()
     setup_python()
     setup_kiosk()
     install_motd()
