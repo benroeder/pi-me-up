@@ -186,21 +186,32 @@ def status():
 
 @task
 def setup_kiosk():
-    """ set up kiosk parts """
+    """ set up kiosk parts 
+        based on https://www.danpurdy.co.uk/web-development/raspberry-pi-kiosk-screen-tutorial/
+    """
     with hide("running", "stderr"):
-        """
-        /etc/xdg/lxsession/LXDE/autostart
         #@xscreensaver -no-splash
+
+        files.comment("/etc/xdg/lxsession/LXDE/autostart", "@xscreensaver -no-splash", use_sudo=True)
+        """ add these below the screen saver line """
+        """
         @xset s off
         @xset -dpms
         @xset s noblank
-        
-        @sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences
-        
-        @chromium --noerrdialogs --kiosk http://www.page-to.display --incognito
-
-        
         """
+        #stop chromium from complaining about unclean shutdown, by making it think it did
+        files.append("/etc/xdg/lxsession/LXDE/autostart",
+                     """@sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences""",
+                     use_sudo=True, escape=True)
+
+        #auto start chromium
+        if not fabric.contrib.files.contains("/etc/xdg/lxsession/LXDE/autostart",
+                                             """@chromium --noerrdialogs --kiosk http://www.page-to.display --incognito""",
+                                             use_sudo=True, escape=True):
+
+            files.append("/etc/xdg/lxsession/LXDE/autostart",
+                         """@chromium --noerrdialogs --kiosk http://www.page-to.display --incognito""",
+                         use_sudo=True, escape=True)
 
 
 @task
