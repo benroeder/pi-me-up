@@ -126,7 +126,7 @@ def setup_kiosk_packages():
     package_update()
 
     with hide("running"):
-        package_ensure("midori")
+        package_ensure("chromium")
         package_ensure("x11-xserver-utils")
         package_ensure("unclutter")
 
@@ -205,20 +205,25 @@ def setup_kiosk():
         #@xscreensaver -no-splash
 
         files.comment("/etc/xdg/lxsession/LXDE/autostart", "@xscreensaver -no-splash", use_sudo=True)
-        """ add these below the screen saver line """
+
         files.append("/etc/xdg/lxsession/LXDE/autostart",
                      "@xset s off", use_sudo=True, escape=True)
         files.append("/etc/xdg/lxsession/LXDE/autostart",
                      "@xset -dpms", use_sudo=True, escape=True)
         files.append("/etc/xdg/lxsession/LXDE/autostart",
                      "@xset s noblank", use_sudo=True, escape=True)
+                     
+        files.append("/etc/xdg/lxsession/LXDE/autostart",
+                     """@sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences""",
+                     use_sudo=True,escape=True)
+
         #auto start
         if not fabric.contrib.files.contains("/etc/xdg/lxsession/LXDE/autostart",
-                                             "@midori -e Fullscreen -a http://google.com",
+                                             "@chromium --noerrdialogs --kiosk http://www.page-to.display --incognito",
                                              use_sudo=True, escape=True):
 
             files.append("/etc/xdg/lxsession/LXDE/autostart",
-                         "@midori -e Fullscreen -a http://google.com",
+                         "@chromium --noerrdialogs --kiosk http://www.page-to.display --incognito",
                          use_sudo=True, escape=True)
 
 
