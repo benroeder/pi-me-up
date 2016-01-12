@@ -6,7 +6,7 @@ from cuisine import (file_exists, dir_exists, file_write, text_strip_margin,
 from cuisine import package_ensure as _package_ensure
 from cuisine import package_update as _package_update
 from fabric.api import sudo, run, env, hide, cd, task
-from fabric.contrib.files import append
+from fabric.contrib.files import append, comment, contains
 from fabric.utils import puts
 from fabric.colors import red, green
 
@@ -204,26 +204,26 @@ def setup_kiosk():
     with hide("running", "stderr"):
         #@xscreensaver -no-splash
 
-        files.comment("/etc/xdg/lxsession/LXDE/autostart", "@xscreensaver -no-splash", use_sudo=True)
+        comment("/etc/xdg/lxsession/LXDE-pi/autostart", "@xscreensaver -no-splash", use_sudo=True)
 
-        files.append("/etc/xdg/lxsession/LXDE/autostart",
+        append("/etc/xdg/lxsession/LXDE-pi/autostart",
                      "@xset s off", use_sudo=True, escape=True)
-        files.append("/etc/xdg/lxsession/LXDE/autostart",
+        append("/etc/xdg/lxsession/LXDE-pi/autostart",
                      "@xset -dpms", use_sudo=True, escape=True)
-        files.append("/etc/xdg/lxsession/LXDE/autostart",
+        append("/etc/xdg/lxsession/LXDE-pi/autostart",
                      "@xset s noblank", use_sudo=True, escape=True)
 
-        files.append("/etc/xdg/lxsession/LXDE/autostart",
+        append("/etc/xdg/lxsession/LXDE-pi/autostart",
                      """@sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences""",
                      use_sudo=True, escape=True)
 
         #auto start
-        if not fabric.contrib.files.contains("/etc/xdg/lxsession/LXDE/autostart",
+        if not contains("/etc/xdg/lxsession/LXDE-pi/autostart",
                                              "@chromium --noerrdialogs --kiosk http://www.page-to.display --incognito",
                                              use_sudo=True, escape=True):
 
-            files.append("/etc/xdg/lxsession/LXDE/autostart",
-                         "@chromium --noerrdialogs --kiosk http://www.page-to.display --incognito",
+            append("/etc/xdg/lxsession/LXDE-pi/autostart",
+                         "@chromium --noerrdialogs --kiosk http://dashingdemo.herokuapp.com/sample --incognito",
                          use_sudo=True, escape=True)
 
 
@@ -232,10 +232,10 @@ def deploy():
     """ Installs pretty much everything to a bare Pi.
     """
     puts(green("Starting deployment"))
-    upgrade_packages()
+    #upgrade_packages()
     setup_packages()
     setup_kiosk_packages()
-    setup_python()
+    #setup_python()
     setup_kiosk()
     install_motd()
     reboot()
