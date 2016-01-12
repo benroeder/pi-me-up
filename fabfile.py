@@ -212,10 +212,10 @@ def setup_kiosk():
                      "@xset -dpms", use_sudo=True, escape=True)
         files.append("/etc/xdg/lxsession/LXDE/autostart",
                      "@xset s noblank", use_sudo=True, escape=True)
-                     
+
         files.append("/etc/xdg/lxsession/LXDE/autostart",
                      """@sed -i 's/"exited_cleanly": false/"exited_cleanly": true/' ~/.config/chromium/Default/Preferences""",
-                     use_sudo=True,escape=True)
+                     use_sudo=True, escape=True)
 
         #auto start
         if not fabric.contrib.files.contains("/etc/xdg/lxsession/LXDE/autostart",
